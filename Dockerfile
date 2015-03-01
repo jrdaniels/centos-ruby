@@ -31,10 +31,6 @@ RUN yum update -y
 # Install tar
 RUN yum install -y tar
 
-# Install header for magic.h
-RUN curl -L https://github.com/file/file/archive/FILE5_11.tar.gz | tar -xzf - -C /tmp/
-RUN install -D -m 644 /tmp/file-FILE5_11/src/magic.h /usr/include/magic.h
-
 # Build environment for ruby
 RUN yum install -y gcc openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel make
 
@@ -46,23 +42,18 @@ RUN make install
 RUN echo -e "install: --no-ri --no-rdoc\nupdate: --no-ri --no-rdoc" >> /usr/local/etc/gemrc
 RUN /usr/local/bin/gem install bundler
 
-# Add service for rails app
-ADD shared/systemd/rails-app.service /etc/systemd/system/
-RUN systemctl enable rails-app
+# Enable networkd
+RUN ln -s  /usr/lib/systemd/system/systemd-networkd.service /etc/systemd/system/multi-user.target.wants/systemd-networkd.service
+RUN ln -s /usr/lib/systemd/system/systemd-networkd.socket /etc/systemd/system/sockets.target.wants/systemd-networkd.socket 
 
-# Network configuration and dns resolver
-RUN systemctl enable systemd-networkd
-RUN systemctl enable systemd-resolved
+# Enable resolved
+RUN ln -s /usr/lib/systemd/system/systemd-resolved.service /etc/systemd/system/multi-user.target.wants/systemd-resolved.service 
+
+ADD environment.conf /etc/default/ruby.conf
 
 RUN rm -r /tmp/*
 
 RUN yum remove -yf gcc openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel make || exit 0
 RUN yum clean -y all
 
-ADD . /srv/app/
-
-WORKDIR /srv/app
-
-RUN bundle install
-RUN bundle exec rake assets:precompile
-
+CMD ["/usr/local/bin/irb"]

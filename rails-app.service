@@ -2,7 +2,7 @@
 Description=Rails Application
 
 [Service]
-# EnvironmentFile=/etc/default/rails.conf
+EnvironmentFile=/etc/default/ruby.conf
 ExecStart=/usr/local/bundle/bin/rails server
 KillMode=process
 KillSignal=SIGINT
