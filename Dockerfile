@@ -1,6 +1,9 @@
 FROM centos:latest
 MAINTAINER fedux.org
 
+ENV http_proxy http://172.17.42.1:3128
+ENV https_proxy https://172.17.42.1:3128
+
 # No mirror plugin
 RUN sed -ir -e "s/enabled=1/enabled=0/" etc/yum/pluginconf.d/fastestmirror.conf
 
@@ -12,7 +15,7 @@ RUN yum install -y vim
 
 # Give systemd a try
 RUN yum remove -y fakesystemd
-RUN yum install -y systemd
+RUN yum install -y systemd dhclient
 
 # Set priorities for default repositories
 RUN yum install -y yum-priorities
@@ -43,17 +46,19 @@ RUN echo -e "install: --no-ri --no-rdoc\nupdate: --no-ri --no-rdoc" >> /usr/loca
 RUN /usr/local/bin/gem install bundler
 
 # Enable networkd
-RUN ln -s  /usr/lib/systemd/system/systemd-networkd.service /etc/systemd/system/multi-user.target.wants/systemd-networkd.service
-RUN ln -s /usr/lib/systemd/system/systemd-networkd.socket /etc/systemd/system/sockets.target.wants/systemd-networkd.socket 
+#RUN ln -s  /usr/lib/systemd/system/systemd-networkd.service /etc/systemd/system/multi-user.target.wants/systemd-networkd.service
+#RUN ln -s /usr/lib/systemd/system/systemd-networkd.socket /etc/systemd/system/sockets.target.wants/systemd-networkd.socket 
 
 # Enable resolved
-RUN ln -s /usr/lib/systemd/system/systemd-resolved.service /etc/systemd/system/multi-user.target.wants/systemd-resolved.service 
+#RUN ln -s /usr/lib/systemd/system/systemd-resolved.service /etc/systemd/system/multi-user.target.wants/systemd-resolved.service 
 
 ADD environment.conf /etc/default/ruby.conf
 
 RUN rm -r /tmp/*
 
-RUN yum remove -yf gcc openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel make || exit 0
+RUN yum remove -y gcc openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel make || exit 0
 RUN yum clean -y all
+
+WORKDIR /
 
 CMD ["/usr/local/bin/irb"]

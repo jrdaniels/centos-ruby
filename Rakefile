@@ -100,3 +100,7 @@ namespace :machine do
     end
   end
 end
+
+task :clean do
+  sh 'sudo rm -rf tmp/*'
+end
