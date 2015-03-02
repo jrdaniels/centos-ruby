@@ -52,7 +52,7 @@ RUN /usr/local/bin/gem install bundler
 # Enable resolved
 #RUN ln -s /usr/lib/systemd/system/systemd-resolved.service /etc/systemd/system/multi-user.target.wants/systemd-resolved.service 
 
-ADD environment.conf /etc/default/ruby.conf
+ADD ruby.conf /etc/default/ruby.conf
 
 RUN rm -r /tmp/*
 
