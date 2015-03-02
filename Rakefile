@@ -53,54 +53,6 @@ namespace :docker do
   end
 end
 
-namespace :machine do
-  desc 'Install machine'
-  task :install, :name, :domain_name do |_, args|
-    name        = args[:name]
-    domain_name = args[:domain_name]
-
-    fail ArgumentError, 'Name argument is missing' if name.nil?
-
-    sh 'sudo cp rails@.service /etc/systemd/system/'
-    sh 'sudo systemctl daemon-reload'
-    sh 'sudo groupadd -f deploy'
-
-    sh 'sudo machinectl pull-dkr --dkr-index-url https://index.docker.io --verify=no --force maxmeyer/centos-rails'
-    sh "sudo systemctl enable rails@#{name}"
-
-    sh "sudo install -m 2775 -d -g deploy /srv/machines/#{name}"
-    sh "sudo install -d /etc/ssl/machines/#{name}"
-    sh "sudo install -d /var/log/machines/#{name}"
-
-    sh "sudo install -m 644 -D environment.conf /etc/default/machines/#{name}.conf"
-    sh "sudo install -m 644 -D default.conf /etc/machines/#{name}/sites-enabled/default.conf"
-    sh "sudo install -m 644 -D ssl.conf /etc/machines/#{name}/other-config/ssl.conf"
-    sh "sudo install -m 644 -D logrotate.conf /etc/logrotate.d/#{name}.conf"
-
-    sh "sudo sed -i -e 's/www_example_org/#{name}/g' /etc/logrotate.d/#{name}.conf"
-    sh "sudo sed -i -e 's/www_example_org/#{name}/g' /etc/default/machines/#{name}.conf"
-    sh "sudo sed -i -e 's/example.org/#{domain_name}/g' /etc/machines/#{name}/sites-enabled/default.conf" if domain_name
-  end
-
-  task :status, :name do |_, args|
-    name = args[:name]
-    fail ArgumentError, 'Name argument is missing' if name.nil?
-
-    sh "sudo systemctl status rails@#{name}"
-  end
-
-  %i(start stop restart).each do |cmd|
-    desc "#{cmd.to_s.capitalize} service"
-    task cmd, :name do |_, args|
-      name = args[:name]
-      fail ArgumentError, 'Name argument is missing' if name.nil?
-
-      sh "sudo systemctl #{cmd} rails@#{name}"
-      Rake::Task['machine:status'].invoke(args[:name])
-    end
-  end
-end
-
 task :clean do
   sh 'sudo rm -rf tmp/*'
 end
