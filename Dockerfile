@@ -34,8 +34,11 @@ RUN yum update -y
 # Install tar
 RUN yum install -y tar
 
+# Build environment for ruby and ruby gems
+RUN yum install -y gcc make
+
 # Build environment for ruby
-RUN yum install -y gcc openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel make
+RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel
 
 # Build ruby
 RUN curl -L http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.0.tar.gz | tar -xzf - -C /tmp/
@@ -56,7 +59,7 @@ ADD ruby.conf /etc/default/ruby.conf
 
 RUN rm -r /tmp/*
 
-RUN yum remove -y gcc openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel make || exit 0
+RUN yum remove -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel || exit 0
 RUN yum clean -y all
 
 WORKDIR /
