@@ -47,7 +47,6 @@ RUN ./configure --disable-install-rdoc
 RUN make install
 RUN echo -e "install: --no-ri --no-rdoc\nupdate: --no-ri --no-rdoc" >> /usr/local/etc/gemrc
 RUN /usr/local/bin/gem install bundler
-RUN /usr/local/bin/gem install rake
 
 # Enable networkd
 #RUN ln -s  /usr/lib/systemd/system/systemd-networkd.service /etc/systemd/system/multi-user.target.wants/systemd-networkd.service
