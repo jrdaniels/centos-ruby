@@ -65,6 +65,3 @@ RUN yum clean -y all
 WORKDIR /
 
 CMD ["/usr/local/bin/irb"]
-
-ONBUILD ADD script/customize.rake /tmp/customize.rake
-ONBUILD RUN rake --rakefile /tmp/customize.rake
