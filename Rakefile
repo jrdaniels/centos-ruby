@@ -62,10 +62,12 @@ namespace :templates do
   task :copy do
     Rake::FileList.new('files/**/*').select { |f| File.directory? f }.each do |d|
       files = Rake::FileList.new("templates/root/*").to_a
+      files += Rake::FileList.new("templates/root/.???*").to_a
       FileUtils.cp(files, d)
 
       type = File.basename(File.dirname(d))
       files = Rake::FileList.new("templates/#{type}/*").to_a
+      files += Rake::FileList.new("templates/#{type}/.???*").to_a
       FileUtils.cp(files, d)
     end
   end
