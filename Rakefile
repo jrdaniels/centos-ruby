@@ -56,3 +56,17 @@ end
 task :clean do
   sh 'sudo rm -rf tmp/*'
 end
+
+namespace :templates do
+  desc 'Copy templates'
+  task :copy do
+    Rake::FileList.new('files/**/*').select { |f| File.directory? f }.each do |d|
+      files = Rake::FileList.new("templates/root/*").to_a
+      FileUtils.cp(files, d)
+
+      type = File.basename(File.dirname(d))
+      files = Rake::FileList.new("templates/#{type}/*").to_a
+      FileUtils.cp(files, d)
+    end
+  end
+end
