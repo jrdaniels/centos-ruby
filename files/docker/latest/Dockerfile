@@ -37,8 +37,9 @@ RUN yum install -y gcc make
 RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel
 
 # Build ruby
-RUN curl -L http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.0.tar.gz | tar -xzf - -C /tmp/
-WORKDIR /tmp/ruby-2.2.0
+RUN install -d /tmp/ruby
+RUN curl -L http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.0.tar.gz | tar -xzf - -C /tmp/ruby --strip-components=1
+WORKDIR /tmp/ruby
 RUN ./configure --disable-install-rdoc
 RUN make install
 RUN echo -e "install: --no-ri --no-rdoc\nupdate: --no-ri --no-rdoc" >> /usr/local/etc/gemrc
