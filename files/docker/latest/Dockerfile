@@ -11,7 +11,7 @@ ENV RUBY_VERSION 2.2.1
 RUN yum install -y gcc make
 
 # Build ruby
-RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel bzip2 \
+RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel bzip2 automake autoconf  \
   && mkdir -p /usr/src/ruby \
   && curl -SL "http://cache.ruby-lang.org/pub/ruby/$RUBY_MAJOR/ruby-$RUBY_VERSION.tar.bz2" \
   | tar -xjC /usr/src/ruby --strip-components=1 \
@@ -20,7 +20,7 @@ RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-
   && ./configure --disable-install-doc \
   && make -j"$(nproc)" \
   && make install \
-  && (yum remove -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel bzip2 || exit 0) \
+  && (yum remove -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel bzip2 automake autoconf || exit 0) \
   && yum clean -y all
   && rm -r /usr/src/ruby
 
