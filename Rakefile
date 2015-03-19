@@ -3,8 +3,9 @@ require 'pathname'
 task default: 'docker:build'
 
 namespace :docker do
-  image_name = 'maxmeyer/centos-rails'
-  container_name = 'rails1'
+  image_name = 'feduxorg/centos-ruby'
+  container_name = 'ruby1'
+  docker_file    = 'files/docker/latest/Dockerfile'
 
   desc 'Build docker image'
   task :build, :nocache do |_, args|
@@ -15,6 +16,7 @@ namespace :docker do
     cmdline << 'build'
     cmdline << '--no-cache=true' if nocache
     cmdline << "-t #{image_name}"
+    cmdline << "-f #{docker_file}"
     cmdline << '.'
 
     sh cmdline.join(' ')
@@ -38,9 +40,6 @@ namespace :docker do
     args << '-it'
     args << '--rm'
     args << "--name #{container_name}"
-    args << "-v #{data_dir}:/var/www"
-    args << "-v #{log_dir}:/var/log"
-    args << "-v #{sites_dir}:/etc/rails/sites-enabled"
 
     cmdline = []
     cmdline << 'docker'
