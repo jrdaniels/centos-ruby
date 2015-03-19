@@ -16,13 +16,23 @@ RUN curl -L http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.0.tar.gz | tar -xzf
 WORKDIR /tmp/ruby
 RUN ./configure --disable-install-rdoc
 RUN make install
-RUN echo -e "install: --no-ri --no-rdoc\nupdate: --no-ri --no-rdoc" >> /usr/local/etc/gemrc
-RUN /usr/local/bin/gem install bundler
 
+# Do not create documentation on gem install
+RUN echo -e "install: --no-ri --no-rdoc\nupdate: --no-ri --no-rdoc" >> /usr/local/etc/gemrc
+
+# Install bundler
+RUN /usr/local/bin/gem install bundler \
+      && bundle config --global path "$GEM_HOME" \
+      && bundle config --global bin "$GEM_HOME/bin"
+
+# Do not create .bundle in apps directory
+ENV BUNDLE_APP_CONFIG $GEM_HOME
+
+# Add defaults file for ruby
 ADD ruby.conf /etc/default/ruby.conf
 
+# Cleanup
 RUN rm -r /tmp/*
-
 RUN yum remove -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel || exit 0
 RUN yum clean -y all
 
