@@ -1,27 +1,36 @@
 FROM feduxorg/centos:latest
 MAINTAINER fedux.org
 
+ENV RUBY_MAJOR 2.2
+ENV RUBY_VERSION 2.2.1
+
 # ENV http_proxy http://172.17.42.1:3128
 # ENV https_proxy https://172.17.42.1:3128
 
 # Build environment for ruby and ruby gems
 RUN yum install -y gcc make
 
-# Build environment for ruby
-RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel
-
 # Build ruby
-RUN install -d /tmp/ruby
-RUN curl -L http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.0.tar.gz | tar -xzf - -C /tmp/ruby --strip-components=1
-WORKDIR /tmp/ruby
-RUN ./configure --disable-install-rdoc
-RUN make install
+RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel \
+  && mkdir -p /usr/src/ruby \
+  && curl -SL "http://cache.ruby-lang.org/pub/ruby/$RUBY_MAJOR/ruby-$RUBY_VERSION.tar.bz2" \
+  | tar -xjC /usr/src/ruby --strip-components=1 \
+  && cd /usr/src/ruby \
+  && autoconf \
+  && ./configure --disable-install-doc \
+  && make -j"$(nproc)" \
+  && make install \
+  && (yum remove -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel || exit 0) \
+  && yum clean -y all
+  && rm -r /usr/src/ruby
 
 # Do not create documentation on gem install
 RUN echo -e "install: --no-ri --no-rdoc\nupdate: --no-ri --no-rdoc" >> /usr/local/etc/gemrc
 
 # Install bundler
-RUN /usr/local/bin/gem install bundler \
+ENV GEM_HOME /usr/local/
+ENV PATH $GEM_HOME/bin:$PATH
+RUN gem install bundler \
       && bundle config --global path "$GEM_HOME" \
       && bundle config --global bin "$GEM_HOME/bin"
 
@@ -31,11 +40,6 @@ ENV BUNDLE_APP_CONFIG $GEM_HOME
 # Add defaults file for ruby
 ADD ruby.conf /etc/default/ruby.conf
 
-# Cleanup
-RUN rm -r /tmp/*
-RUN yum remove -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel || exit 0
-RUN yum clean -y all
-
 WORKDIR /
 
-CMD ["/usr/local/bin/irb"]
+CMD ["irb"]
