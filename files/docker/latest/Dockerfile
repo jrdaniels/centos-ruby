@@ -1,4 +1,4 @@
-FROM feduxorg/centos:latest
+FROM feduxorg/centos:docker-latest
 MAINTAINER fedux.org
 
 ENV RUBY_MAJOR 2.2
@@ -11,7 +11,7 @@ ENV RUBY_VERSION 2.2.1
 RUN yum install -y gcc make
 
 # Build ruby
-RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel \
+RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel bzip2 \
   && mkdir -p /usr/src/ruby \
   && curl -SL "http://cache.ruby-lang.org/pub/ruby/$RUBY_MAJOR/ruby-$RUBY_VERSION.tar.bz2" \
   | tar -xjC /usr/src/ruby --strip-components=1 \
@@ -20,11 +20,9 @@ RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-
   && ./configure --disable-install-doc \
   && make -j"$(nproc)" \
   && make install \
+  && (yum remove -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel bzip2 || exit 0) \
+  && yum clean -y all
   && rm -r /usr/src/ruby
-
-# Cleanup
-RUN yum remove -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel || exit 0
-RUN yum clean -y all
 
 # Do not create documentation on gem install
 RUN echo -e "install: --no-ri --no-rdoc\nupdate: --no-ri --no-rdoc" >> /usr/local/etc/gemrc
