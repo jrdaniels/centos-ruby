@@ -28,7 +28,7 @@ RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-
 RUN echo -e "install: --no-ri --no-rdoc\nupdate: --no-ri --no-rdoc" >> /usr/local/etc/gemrc
 
 # Install bundler
-ENV GEM_HOME /usr/local/
+ENV GEM_HOME /usr/local/bundle
 ENV PATH $GEM_HOME/bin:$PATH
 RUN gem install bundler \
       && bundle config --global path "$GEM_HOME" \
