@@ -1,5 +1,5 @@
 FROM feduxorg/centos:latest
-MAINTAINER fedux.org
+MAINTAINER dev@fedux.org
 
 ENV RUBY_MAJOR 2.2
 ENV RUBY_VERSION 2.2.1
@@ -11,7 +11,7 @@ ENV RUBY_VERSION 2.2.1
 RUN yum install -y gcc make
 
 # Build ruby
-RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel bzip2 automake autoconf \
+RUN yum install -y openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel bzip2 automake autoconf  \
   && mkdir -p /usr/src/ruby \
   && curl -SL "http://cache.ruby-lang.org/pub/ruby/$RUBY_MAJOR/ruby-$RUBY_VERSION.tar.bz2" \
   | tar -xjC /usr/src/ruby --strip-components=1 \
@@ -43,10 +43,3 @@ ADD ruby.conf /etc/default/ruby.conf
 WORKDIR /
 
 CMD ["irb"]
-
-# Enable networkd
-#RUN ln -s  /usr/lib/systemd/system/systemd-networkd.service /etc/systemd/system/multi-user.target.wants/systemd-networkd.service
-#RUN ln -s /usr/lib/systemd/system/systemd-networkd.socket /etc/systemd/system/sockets.target.wants/systemd-networkd.socket 
-
-# Enable resolved
-#RUN ln -s /usr/lib/systemd/system/systemd-resolved.service /etc/systemd/system/multi-user.target.wants/systemd-resolved.service 
