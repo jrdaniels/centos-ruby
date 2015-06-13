@@ -5,7 +5,7 @@ task default: 'docker:build'
 namespace :docker do
   image_name = 'feduxorg/centos-ruby'
   container_name = 'ruby1'
-  docker_file    = 'files/docker/latest/Dockerfile'
+  docker_file    = 'files/latest/Dockerfile'
 
   desc 'Build docker image'
   task :build, :nocache do |_, args|
